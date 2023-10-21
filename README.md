@@ -1,7 +1,5 @@
-This project is intended to scan instagram reels for text, and convert them to text
+This project is intended to scan a given instagram reel for text which appears on-screen, and scrape it into a .csv
 
-Current Tech Stack:
-OpenCV, Pytesseract
+Current Tech Stack (WIP):
 
-Future Tech Stack:
-Will use Instagram API to enable scraping from URL
+OpenCV, Pytesseract, numpy
