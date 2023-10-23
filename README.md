@@ -1,5 +1,7 @@
-This project is intended to scan a given instagram reel for text which appears on-screen, and scrape it into a .csv
+This desktop app is intended to scan a given video or instagram reel for text which appears on-screen, and scrape it into a .csv
 
-Current Tech Stack (WIP):
+Current Tech Stack:
 
-OpenCV, Pytesseract, numpy
+Frontend: Electron Forge
+
+Backend: OpenCV, Pytesseract, numpy
