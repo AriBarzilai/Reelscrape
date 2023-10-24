@@ -116,7 +116,7 @@ def export_to_csv(extracted_texts):
 def main(video_path):
     """Main function to extract text from video and export to CSV"""
     cwd = os.getcwd()
-    #print("Extracting text from video, please be patient...", end='\r', flush=True)
+    print("Extracting text from video, please be patient...", flush=True)
     
     videos_dir, save_dir = setup_directories(cwd)
         
@@ -146,7 +146,7 @@ def main(video_path):
         extracted_texts.append((seconds_to_timestamp(video_seconds), text))
         
         if video_seconds == frame_milestone:
-            #print(f"Processed {int(load_progress*100)}%... {frame_number}/{total_frames} frames", end='\r', flush=True)                
+            print(f"Processed {int(load_progress*100)}%... {frame_number}/{total_frames} frames", flush=True)                
             load_progress += 0.05
             frame_milestone = int(total_frames/fps * load_progress)
         video_seconds += 1
@@ -155,7 +155,7 @@ def main(video_path):
     extracted_texts = deduplicate_by_proximity(extracted_texts)
     #print("Finished extracting text from video. Exporting to csv...", flush=True)
     export_to_csv(extracted_texts)
-    #print("Complete!\nSelect a new video to get started...", end='\r', flush=True)
+    print("Complete!\nSelect a new video to get started...", flush=True)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
