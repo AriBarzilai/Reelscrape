@@ -1,66 +1,85 @@
 const { remote } = require('electron');
 const { dialog } = remote;
-const { spawn } = require('child_process'); // Import the spawn function
+const { spawn, exec } = require('child_process');
 const path = require('path');
 
-const { exec } = require('child_process');
-exec('python -u -c "import sys; print(sys.executable)"', (error, stdout, stderr) => {
-    if (error) {
-        console.error(`Python Error: ${error}`);
-        return;
-    }
-    console.log(`Python Executable Used by Electron: ${stdout}`);
-});
+// Initialize application
+async function initializeApp() {
+    await printPythonExecutablePath();
+    setupOpenFileButton();
+}
 
-const openFileBtn = document.getElementById('openFileBtn');
-const notificationText = document.getElementById('notificationText');
-openFileBtn.onclick = e => {
-  openFileBtn.innerText = "Selecting file...";
-  dialog.showOpenDialog({
-    properties: ['openFile']
-  }).then(result => {
-    if (!result.canceled && result.filePaths.length > 0) {
-      openFileBtn.innerText = "Loading...";
-      const filePath = result.filePaths[0];
-      console.log(`Path of selected file: ${filePath}`);
-      
-      // Run the Python script with the selected file as an argument
-      
-      const scriptPath = path.join(__dirname, 'main.py');
-      const pythonProcess = spawn('python3', [scriptPath, filePath]);
-
-      pythonProcess.stdout.on('data', (data) => {
-        console.log(`Python Output: ${data}`);
-        if(data.toString().trim() != "REQUEST_OUTPUT_PATH") {
-          notificationText.innerText = data;
-        } else {
-          notificationText.innerText = "Selecting output file...";
-          dialog.showSaveDialog({
-            buttonLabel: 'Save file',
-            defaultPath: `vid-${Date.now()}.csv`
-          }).then(result => {
-            if (!result.canceled && result.filePath) {
-                const outputPath = result.filePath;
-                console.log(`Path of selected output directory: ${outputPath}`);
-                pythonProcess.stdin.write(outputPath + '\n');
-            } else {
-                notificationText.innerText = "No output file selected.";
-            }
-          }).catch(err => {
-              console.error('Error selecting output file:', err);
-          });
-        
+// Prints the Python executable used by Electron
+async function printPythonExecutablePath() {
+    exec('python -u -c "import sys; print(sys.executable)"', (error, stdout) => {
+        if (error) {
+            console.error(`Python Error: ${error}`);
+            return;
         }
-      });
+        console.log(`Python Executable Used by Electron: ${stdout}`);
+    });
+}
 
-      pythonProcess.stderr.on('data', (data) => {
+function setupOpenFileButton() {
+    const openFileBtn = document.getElementById('openFileBtn');
+    openFileBtn.onclick = async () => {
+        openFileBtn.innerText = "Selecting file...";
+
+        try {
+            const result = await dialog.showOpenDialog({ properties: ['openFile'] });
+            if (!result.canceled && result.filePaths.length > 0) {
+                const filePath = result.filePaths[0];
+                console.log(`Path of selected file: ${filePath}`);
+                await runPythonScript(filePath);
+            } else {
+                openFileBtn.innerText = "Open File";
+            }
+        } catch (err) {
+            console.error('Error selecting file:', err);
+        }
+    };
+}
+
+async function runPythonScript(filePath) {
+    const openFileBtn = document.getElementById('openFileBtn');
+    const notificationText = document.getElementById('notificationText');
+
+    openFileBtn.innerText = "Loading...";
+    const scriptPath = path.join(__dirname, 'main.py');
+    const pythonProcess = spawn('python3', [scriptPath, filePath]);
+
+    pythonProcess.stdout.on('data', async (data) => {
+        console.log(`Python Output: ${data}`);
+        const dataStr = data.toString().trim();
+
+        if (dataStr !== "REQUEST_OUTPUT_PATH") {
+            notificationText.innerText = data;
+        } else {
+            try {
+                const saveResult = await dialog.showSaveDialog({
+                    buttonLabel: 'Save file',
+                    defaultPath: `vid-${Date.now()}.csv`
+                });
+
+                if (!saveResult.canceled && saveResult.filePath) {
+                    const outputPath = saveResult.filePath;
+                    console.log(`Path of selected output directory: ${outputPath}`);
+                    pythonProcess.stdin.write(outputPath + '\n');
+                } else {
+                    notificationText.innerText = "No output file selected.";
+                }
+            } catch (err) {
+                console.error('Error selecting output file:', err);
+            }
+            openFileBtn.innerText = "Open File";
+            setupOpenFileButton();
+        }
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
         console.error(`Python Error: ${data}`);
-      });
+    });
+}
 
-    } else {
-      openFileBtn.innerText = "Open File";
-    }
-  }).catch(err => {
-    console.error('Error selecting file:', err);
-  });
-};
+// Start the application
+initializeApp();
