@@ -1,7 +1,9 @@
 const { remote } = require('electron');
 const { dialog } = remote;
-const { spawn, exec } = require('child_process');
+const { spawn, execFile } = require('child_process');
+const fs = require('fs');
 const path = require('path');
+const pythonExecutable = path.join(process.cwd(), 'myappenv', 'Scripts', 'python.exe');
 
 // Initialize application
 async function initializeApp() {
@@ -9,14 +11,20 @@ async function initializeApp() {
     setupOpenFileButton();
 }
 
-// Prints the Python executable used by Electron
 async function printPythonExecutablePath() {
-    exec('python -u -c "import sys; print(sys.executable)"', (error, stdout) => {
+    // Check if the python executable exists at the specified path
+    if (!fs.existsSync(pythonExecutable)) {
+        console.error('Python Executable does not exist at the specified path.');
+        return;
+    }
+    
+    // Use execFile to execute the specified executable
+    execFile(pythonExecutable, ['-u', '-c', 'import sys; print(sys.executable)'], (error, stdout) => {
         if (error) {
             console.error(`Python Error: ${error}`);
             return;
         }
-        console.log(`Python Executable Used by Electron: ${stdout}`);
+        console.log(`Python Executable Used by Electron: ${stdout.trim()}`);
     });
 }
 
@@ -46,7 +54,7 @@ async function runPythonScript(filePath) {
 
     openFileBtn.innerText = "Loading...";
     const scriptPath = path.join(__dirname, 'main.py');
-    const pythonProcess = spawn('python3', [scriptPath, filePath]);
+    const pythonProcess = spawn(pythonExecutable, [scriptPath, filePath]);
 
     pythonProcess.stdout.on('data', async (data) => {
         console.log(`Python Output: ${data}`);
