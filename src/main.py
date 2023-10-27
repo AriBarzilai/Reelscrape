@@ -12,28 +12,26 @@ SIMILARITY_THRESHOLD = 70
 TIME_WINDOW = 5
 LOAD_PROGRESS_INCREMENT = 0.05
 
-def create_directory(path):
-    """Create a directory if it doesn't exist."""
-    if not os.path.exists(path):
-        os.makedirs(path)
+def init():
+    """Initializes the program by setting up the video path and tesseract executable path.
 
-def setup_directories(base_path):
-    """Set up data and output directories."""
-    data_dir = os.path.join(base_path, "data")
-    videos_dir = os.path.join(data_dir, "videos")
-    output_dir = os.path.join(data_dir, "output")
-
-    create_directory(data_dir)
-    create_directory(videos_dir)
-    create_directory(output_dir)
+    Returns:
+        Path of selected video.
+    """
+    if len(sys.argv) < 2:
+        raise Exception("Video path is null")
     
-    return videos_dir, output_dir
-
+    tesseract_path = os.path.join(os.getcwd(), 'myappenv', 'Tesseract-OCR', 'tesseract.exe')
+    if not os.path.exists(tesseract_path):
+        raise FileNotFoundError(f"'tesseract.exe' not found at {tesseract_path}")
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
+    return sys.argv[1]    
+        
 def setup_video_capture(video_path):
     """Initialize video capture."""
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        raise Exception(f"Could not open video at {video_path}. Please ensure it exists and try again.")
+        raise Exception(f"Could not open video at {video_path}.\nPlease check the file and try again.")
     return cap
 
 def process_frame(frame):
@@ -105,7 +103,7 @@ def export_to_csv(extracted_texts):
     """Export extracted texts to CSV."""
     print("REQUEST_OUTPUT_PATH", end='\r', flush=True)
     csv_path = input().strip()
-    #print(csv_path)
+
     with open(csv_path, "w") as csv_file:
         writer = csv.writer(csv_file, lineterminator='\n')
         writer.writerow(["Time", "Text in English"])
@@ -115,11 +113,6 @@ def export_to_csv(extracted_texts):
 
 def main(video_path):
     """Main function to extract text from video and export to CSV"""
-    cwd = os.getcwd()
-    print("Extracting text from video, please be patient...", flush=True)
-    
-    videos_dir, save_dir = setup_directories(cwd)
-        
     cap = setup_video_capture(video_path)
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     video_seconds = 0 # to keep track of the seconds elapsed in the video
@@ -153,13 +146,9 @@ def main(video_path):
     cap.release()
     
     extracted_texts = deduplicate_by_proximity(extracted_texts)
-    #print("Finished extracting text from video. Exporting to csv...", flush=True)
     export_to_csv(extracted_texts)
     print("Complete!\nSelect a new video to get started...", flush=True)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        #print("Please provide a video path as an argument.")
-        sys.exit(1)
-    video_path = sys.argv[1]
+    video_path = init()
     main(video_path)
