@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, globalShortcut } = require('electron');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -17,6 +17,16 @@ const createWindow = () => {
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.removeMenu();
+  mainWindow.resizable = false;
+
+  // Open the DevTools.
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    if (mainWindow.webContents.isDevToolsOpened()) {
+      mainWindow.webContents.closeDevTools();
+    } else {
+      mainWindow.webContents.openDevTools();
+    }
+  });
 };
 
 app.on('ready', createWindow);
@@ -27,6 +37,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
 });
 
 app.on('activate', () => {
