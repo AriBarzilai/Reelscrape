@@ -1,7 +1,7 @@
 {
   "name": "reelscape",
   "productName": "reelscape",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scrape text and subtitles from reels and other video files",
   "private": true,
   "main": "src/index.js",
