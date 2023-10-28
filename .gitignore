@@ -2,3 +2,4 @@ node_modules/
 myappenv/
 reelscape-win32-x64/
 Tesseract-OCR/
+*.zip
