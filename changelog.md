@@ -1,6 +1,6 @@
-V-1.01:
+V-0.11:
     - Added basic app functionality
     - Added packaged app as .zip file
 
-V-1.00:
+V-0.10:
     - Created basic script functionality
