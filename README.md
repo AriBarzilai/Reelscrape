@@ -1,10 +1,12 @@
 This desktop app is intended to scan a given video or instagram reel for text which appears on-screen, and scrape it into a .csv
 
 Languages: Python, Javascript
+
 Tech Stack: Electron Forge, OpenCV, Pytesseract, numpy
 
 **Important:**
 In order to be distributable as an .exe without requiring the user to install additional files separately, the project has embedded Python and Tesseract, which has been excluded from the git repository.
+
 If you wish to run the project from the source files, you need to add these excluded files.
 You can do that by doing the following:
 
