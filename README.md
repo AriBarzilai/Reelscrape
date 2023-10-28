@@ -15,7 +15,9 @@ You can do that by doing the following:
 3. Install [Tesseract-OCR](https://github.com/tesseract-ocr/tesseract#installing-tesseract) and place the Tesseract-OCR folder inside the root folder (should be in the same directory as myappenv)
 3. Install the necessary python libraries: [OpenCV](https://pypi.org/project/opencv-python/), [PyTesseract](https://pypi.org/project/pytesseract/) and [TheFuzz](https://pypi.org/project/thefuzz/) as per their installation instructions
 4. Run the commands:
-```npm install
-npm start```
+```
+npm install
+npm start
+```
 
 To package the app, run ```npx electron-packager .```
