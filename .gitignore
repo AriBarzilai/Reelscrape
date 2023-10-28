@@ -1,6 +1,5 @@
-*.jpg
-*.mp4
-*.env
-*.txt
-*.csv
-node_modules
+node_modules/
+myappenv/
+reelscape-win32-x64/
+Tesseract-OCR/
+*.zip
