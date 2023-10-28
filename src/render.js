@@ -3,7 +3,8 @@ const { dialog } = remote;
 const { spawn, execFile } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const pythonExecutable = path.join(process.cwd(), 'myappenv', 'Scripts', 'python.exe');
+const rootFolder = path.resolve(__dirname, '..');
+const pythonExecutable = path.join(rootFolder, 'myappenv', 'Scripts', 'python.exe');
 
 // Initialize application
 async function initializeApp() {
@@ -14,7 +15,7 @@ async function initializeApp() {
 async function printPythonExecutablePath() {
     // Check if the python executable exists at the specified path
     if (!fs.existsSync(pythonExecutable)) {
-        console.error('Python Executable does not exist at the specified path.');
+        console.error(`Python Executable does not exist at the specified path: ${pythonExecutable}`);
         return;
     }
     
@@ -53,6 +54,7 @@ async function runPythonScript(filePath) {
     const notificationText = document.getElementById('notificationText');
 
     openFileBtn.innerText = "Loading...";
+    notificationText.innerText = "Loading...";
     const scriptPath = path.join(__dirname, 'main.py');
     const pythonProcess = spawn(pythonExecutable, [scriptPath, filePath]);
 

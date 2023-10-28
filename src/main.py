@@ -20,8 +20,8 @@ def init():
     """
     if len(sys.argv) < 2:
         raise Exception("Video path is null")
-    
-    tesseract_path = os.path.join(os.getcwd(), 'myappenv', 'Tesseract-OCR', 'tesseract.exe')
+    root_path = os.path.dirname(os.path.dirname(__file__))
+    tesseract_path = os.path.join(root_path, 'Tesseract-OCR', 'tesseract.exe')
     if not os.path.exists(tesseract_path):
         raise FileNotFoundError(f"'tesseract.exe' not found at {tesseract_path}")
     pytesseract.pytesseract.tesseract_cmd = tesseract_path
